@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciador de Funcionários{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div  class="container-interno">
+        <h1>Lista de Funcionários</h1>
+        <label>Para fazer pesquisas nos itens, tecle: Ctrl+f.<br />Então digite o termo a ser pesquisado.</label>
+        <hr />
+        <div>
+            <nav style="text-align: center;">
+                <a href="{{ url_for('dashboard') }}">Voltar ao Painel de Controle</a> |
+                <a href="{{ url_for('cadastrar_funcionario') }}">Cadastrar Funcionário</a> |
+                <a href="{{ url_for('metrica_funcionarios') }}">Métrica</a>
+            </nav>
+        </div>
+
+        {% if funcionarios %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><a href="{{ url_for('gerenciar_funcionarios', ordenar_por='nome_completo', ordem='asc' if ordenar_por == 'nome_completo' and ordem == 'desc' else 'desc') }}">Nome</a></th>
+                    <th><a href="{{ url_for('gerenciar_funcionarios', ordenar_por='cargo', ordem='asc' if ordenar_por == 'cargo' and ordem == 'desc' else 'desc') }}">Cargo</a></th>
+                    <th><a href="{{ url_for('gerenciar_funcionarios', ordenar_por='numero_vendas_mes', ordem='desc' if ordenar_por == 'numero_vendas_mes' and ordem == 'asc' else 'asc') }}">Nº de Vendas (Mês)</a></th>
+                    <th><a href="{{ url_for('gerenciar_funcionarios', ordenar_por='total_valor_mes', ordem='desc' if ordenar_por == 'total_valor_mes' and ordem == 'asc' else 'asc') }}">Valor Vendido (Mês)</a></th>
+                    <!-- ALTERAÇÃO: Cabeçalho da coluna mudado para "Status" -->
+                    <th><a href="{{ url_for('gerenciar_funcionarios', ordenar_por='data_fim_contrato', ordem='asc' if ordenar_por == 'data_fim_contrato' and ordem == 'desc' else 'desc') }}">Status</a></th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for funcionario in funcionarios %}
+                <tr>
+                    <!-- Lógica para tachar o nome se o contrato estiver encerrado -->
+                    {% if funcionario.data_fim_contrato %}
+                        <td style="text-decoration: line-through;" title="Contrato encerrado em {{ funcionario.data_fim_contrato }}">{{ funcionario.nome_completo |e }}</td>
+                    {% else %}
+                        <td>{{ funcionario.nome_completo |e }}</td>
+                    {% endif %}
+
+                    <td>{{ funcionario.cargo |e }}</td>
+                    <td>{{ funcionario.numero_vendas_mes }}</td>
+                    <td>R$ {{ "%.2f"|format(funcionario.total_valor_mes) }}</td>
+
+                    <!-- Lógica para exibir "Ativo" ou "Inativo" com cores -->
+                    {% if funcionario.data_fim_contrato %}
+                        <td style="color: #dc3545; font-weight: bold;">Inativo</td>
+                    {% else %}
+                        <td style="color: #198754; font-weight: bold;">Ativo</td>
+                    {% endif %}
+                    <!-- ===================================================================== -->
+
+                    <td>
+                        <a href="{{ url_for('editar_funcionario', funcionario_id=funcionario.id) }}">Editar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div>
+            <nav>
+                <p>Nenhum funcionário cadastrado ainda.</p>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

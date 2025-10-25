@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Roupa{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="container-interno">
+        <h1>Editar Roupa</h1>
+        <form method="post">
+            <div class="form-group">
+                <label for="codigo_produto">Código do Produto:</label>
+                <input type="text" class="form-control" id="codigo_produto" name="codigo_produto" value="{{ roupa.codigo_produto |e }}" required>
+            </div>
+            <div class="form-group">
+                <label for="tipo_roupa">Tipo de Roupa:</label>
+                <select id="tipo_roupa" name="tipo_roupa" required>
+                    <option value="Camiseta">Camiseta</option>
+                    <option value="Camisa">Camisa</option>
+                    <option value="Blusa">Blusa</option>
+                    <option value="Regata">Regata</option>
+                    <option value="Casaco">Casaco</option>
+                    <option value="Blazer">Blazer</Calça>
+                    <option value="Calça">Calça</option>
+                    <option value="Saia">Saia</option>
+                    <option value="Bermuda">Bermuda</option>
+                    <option value="Pantalona">Pantalona</option>
+                    <option value="Vestido">Vestido</option>
+                    <option value="Macacão">Macacão</option>
+                    <option value="Jardineira">Jardineira</option>
+                    <option value="Lingerie">Lingerie</option>
+                    <option value="Cueca">Cueca</option>
+                    <option value="Meia">Meia</option>
+                    <option value="Roupa de banho">Roupa de banho</option>
+                    <option value="Roupa de dormir">Roupa de dormir</option>
+                    <option value="Roupa esportiva">Roupa esportiva</option>
+                    <option value="Black-tie (Traje de Gala)">Black-tie (Traje de Gala)</option>
+                    <option value="White-tie (Formal)">White-tie (Formal)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tecido">Tecido:</label>
+                <select id="tecido" name="tecido" required>
+                    <option value="Algodão">Algodão</option>
+                    <option value="Algodão e Poliéster">Algodão e Poliéster</option>
+                    <option value="Linho">Linho</option>
+                    <option value="Seda">Seda</option>
+                    <option value="Lã">Lã</option>
+                    <option value="Veludo">Veludo</option>
+                    <option value="Viscose">Viscose</option>
+                    <option value="Cupro">Cupro</option>
+                    <option value="Tencel">Tencel</option>
+                    <option value="Poliéster">Poliéster</option>
+                    <option value="Nylon">Nylon</option>
+                    <option value="Elastano">Elastano</option>
+                    <option value="Microfibra">Microfibra</option>
+                    <option value="Cetim">Cetim</option>
+                    <option value="Suede">Suede</option>
+                    <option value="Cupro">Cupro</option>
+                    <option value="Couro">Couro</option>
+                    <option value="Jeans">Jeans</option>
+                 </select>
+            </div>
+            <div class="form-group">
+                <label for="quantidade">Quantidade:</label>
+                <input type="number" class="form-control" id="quantidade" name="quantidade" value="{{ roupa.quantidade |e }}" required>
+            </div>
+            <div class="form-group">
+                <label for="quantida_vendas">Quantidade de Vendas:</label>
+                <input type="number" class="form-control" id="quantida_vendas" name="quantida_vendas" value="{{ roupa.quantida_vendas |e }}" readonly required>
+            </div>
+             <div class="form-group">
+                <label for="cor">Cor:</label>
+                <input type="text" class="form-control" id="cor" name="cor" value="{{ roupa.cor |e }}" required>
+            </div>
+            <div class="form-group">
+                <label for="tamanhos">Tamanhos:</label>
+                <input type="text" class="form-control" id="tamanhos" name="tamanhos" value="{{ roupa.tamanhos |e }}" required>
+            </div>
+            <div class="form-group">
+                <label for="detalhes">Detalhes:</label>
+                <textarea class="form-control" id="detalhes" name="detalhes" rows="3">{{ roupa.detalhes |e }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="preco_unitario">Preço Unitário:</label>
+                <input type="number" step="0.01" class="form-control" id="preco_unitario" name="preco_unitario" value="{{ roupa.preco_unitario |e }}" oninput="formatarMoeda(this)" />
+            </div>
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            <a href="{{ url_for('listar_roupas') }}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+<script>
+   function formatarMoeda(input) {
+        let valor = input.value;
+        valor = valor.replace(/\D/g, "");
+        valor = valor.padStart(0, '0');
+        valor = valor.slice(0, -2) + '.' + valor.slice(-2);
+        input.value = valor;
+    }
+</script>
+{% endblock %}

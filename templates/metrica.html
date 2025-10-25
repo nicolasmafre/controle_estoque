@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard de Métricas{% endblock %}
+
+{% block content %}
+<style>
+    /* Estilos para os cartões de KPI */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+    .kpi-card {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+    }
+    .kpi-card h3 {
+        margin: 0 0 10px;
+        font-size: 1rem;
+        color: #6c757d;
+        font-weight: normal;
+    }
+    .kpi-card p {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: bold;
+        color: #343a40;
+    }
+    .kpi-card small {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    /* Estilos para os contêineres dos gráficos */
+    .chart-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+        align-items: start;
+    }
+    .chart-container {
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+
+    /* Cores dinâmicas para o KPI de projeção */
+    .projecao.green { color: #198754; }
+    .projecao.red { color: #dc3545; }
+    .projecao.blue { color: #0d6efd; }
+    .projecao.grey { color: #6c757d; }
+
+    /* Responsividade para telas menores */
+    @media (max-width: 992px) {
+        .chart-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="container-interno">
+        <h1>Análise de Performance de Vendas</h1>
+        <p>
+            <a href="{{ url_for('dashboard') }}">Voltar ao Painel de Controle</a> |
+            <a href="{{ url_for('listar_roupas') }}">Ir à Lista de Roupas</a> |
+            <a href="{{ url_for('metrica_funcionarios') }}">Metrica de Funcionários</a> |
+            <a href="{{ url_for("metrica_clientes") }}">Métrica Clientes</a>
+        </p>
+
+        <!-- Seção de Indicadores (KPIs) -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <h3>Total de Vendas<br />(12 meses)</h3>
+                <p id="kpi-total">R$ 0,00</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Média Mensal</h3>
+                <p id="kpi-media">R$ 0,00</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Mês de Melhor Performance</h3>
+                <p id="kpi-melhor-mes-label">N/A</p>
+                <small id="kpi-melhor-mes-valor">R$ 0,00</small>
+            </div>
+            <!-- NOVO CARD DE PROJEÇÃO -->
+            <div class="kpi-card">
+                <h3>Projeção Próximo Mês</h3>
+                <p id="kpi-projecao" class="projecao grey">0.0%</p>
+            </div>
+        </div>
+
+        <!-- Seção dos Gráficos -->
+        <div class="chart-grid">
+            <div class="chart-container">
+                <canvas id="graficoVendasMensais"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="graficoTopProdutos"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const METRICS_URL = "{{ url_for('dados_dashboard_metricas') }}";
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch(METRICS_URL)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro na rede: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // --- 1. Atualiza os KPIs ---
+            document.getElementById('kpi-total').textContent = data.kpis.total;
+            document.getElementById('kpi-media').textContent = data.kpis.average;
+            document.getElementById('kpi-melhor-mes-label').textContent = data.kpis.best_month_label;
+            document.getElementById('kpi-melhor-mes-valor').textContent = data.kpis.best_month_value;
+
+            // Atualiza o novo KPI de projeção
+            const projecaoEl = document.getElementById('kpi-projecao');
+            projecaoEl.textContent = data.kpis.projection.value;
+            projecaoEl.classList.remove('grey'); // Remove a cor padrão
+            projecaoEl.classList.add(data.kpis.projection.color); // Adiciona a cor calculada
+
+            // --- 2. Renderiza o Gráfico de Vendas Mensais (Barras) ---
+            const ctxBar = document.getElementById('graficoVendasMensais').getContext('2d');
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: data.monthly_sales.labels,
+                    datasets: [{
+                        label: 'Valor Total Vendido (R$)',
+                        data: data.monthly_sales.values,
+                        backgroundColor: 'rgba(248,97,97,0.6)',
+                        borderColor: 'rgb(204,0,0)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } },
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: {
+                            display: true,
+                            text: 'Vendas Mensais (Últimos 12 Meses)',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+
+            // --- 3. Renderiza o Gráfico de Top Produtos (Pizza) ---
+            const ctxPie = document.getElementById('graficoTopProdutos').getContext('2d');
+            new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: data.top_products.labels,
+                    datasets: [{
+                        label: 'Valor Vendido',
+                        data: data.top_products.values,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)',
+                            'rgba(255,186,0,0.7)', 'rgba(41,81,135,0.7)',
+                            'rgba(153, 102, 255, 0.7)', 'rgba(34,31,31,0.7)'
+                        ],
+                        hoverOffset: 9
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: {
+                            display: true,
+                            text: 'Top 6 Produtos Mais Vendidos (Valor)',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar dados para o dashboard:', error);
+            document.querySelector('.container-interno').innerHTML += '<p style="text-align: center; color: #fa0101;"><strong>Não foi possível carregar os dados das métricas.</strong></p>';
+        });
+});
+</script>
+{% endblock %}
+

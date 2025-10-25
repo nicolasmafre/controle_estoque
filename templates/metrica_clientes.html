@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Análise de Clientes{% endblock %}
+
+{% block content %}
+<style>
+    /* Estilos copiados de metrica.html para consistência */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .kpi-card { background-color: #f8f9fa; border-radius: 8px; padding: 20px; text-align: center; border: 1px solid #dee2e6; }
+    .kpi-card h3 { margin: 0 0 10px; font-size: 1rem; color: #6c757d; font-weight: normal; }
+    .kpi-card p { margin: 0; font-size: 1.75rem; font-weight: bold; color: #343a40; }
+    .kpi-card small { font-size: 0.9rem; color: #6c757d; }
+    .chart-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-top: 30px; }
+    .chart-container { padding: 20px; border-radius: 8px; border: 1px solid #dee2e6; background-color: #fff; }
+</style>
+
+<div class="container">
+    <div class="container-interno">
+        <h1>Análise de Clientes</h1>
+        <p>
+            <a href="{{ url_for('dashboard') }}">Voltar ao Painel de Controle</a> |
+            <a href="{{ url_for('painel_clientes') }}">Voltar ao Painel de Clientes</a> |
+            <a href="{{ url_for('metrica') }}">Métricas Vendas</a> |
+            <a href="{{ url_for("metrica_funcionarios") }}">Métrica Funcionários</a>
+        </p>
+
+        <!-- Seção de Indicadores (KPIs) de Clientes -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <h3>Total de Clientes</h3>
+                <p id="kpi-total-clientes">0</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Novos Clientes (30d)</h3>
+                <p id="kpi-novos-clientes">0</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Maior Gasto (3m)</h3>
+                <p id="kpi-maior-gastador-nome" style="font-size: 1.2rem;">N/A</p> <!-- Tamanho ajustado -->
+                <small id="kpi-maior-gastador-valor">R$ 0,00</small>
+            </div>
+        </div>
+
+        <!-- Seção do Gráfico -->
+        <div class="chart-grid">
+            <div class="chart-container">
+                <canvas id="graficoTopClientes"></canvas>
+            </div>
+            <!-- Futuramente, pode adicionar mais gráficos aqui -->
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // URL da nova API de métricas de clientes
+    const CLIENT_METRICS_URL = "{{ url_for('dados_metricas_clientes') }}";
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch(CLIENT_METRICS_URL)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro na rede: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // --- 1. Atualiza os KPIs de Clientes ---
+            document.getElementById('kpi-total-clientes').textContent = data.kpis.total_clientes;
+            document.getElementById('kpi-novos-clientes').textContent = data.kpis.novos_clientes_30d;
+            document.getElementById('kpi-maior-gastador-nome').textContent = data.kpis.maior_gastador_nome;
+            document.getElementById('kpi-maior-gastador-valor').textContent = data.kpis.maior_gastador_valor;
+
+            // --- 2. Renderiza o Gráfico de Top Clientes (Barras Horizontais) ---
+            const ctxTopClients = document.getElementById('graficoTopClientes').getContext('2d');
+            new Chart(ctxTopClients, {
+                type: 'bar',
+                data: {
+                    labels: data.top_clients_spending.labels,
+                    datasets: [{
+                        label: 'Valor Total Gasto (R$)',
+                        data: data.top_clients_spending.values,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Faz o gráfico ser horizontal
+                    responsive: true,
+                    maintainAspectRatio: true, // Permite ajustar a altura
+                    scales: { x: { beginAtZero: true } },
+                    plugins: {
+                        legend: { display: false }, // Esconde a legenda para gráfico de barras
+                        title: {
+                            display: true,
+                            text: 'Top 5 Clientes por Valor Gasto (Últimos 12 Meses)',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar dados para o dashboard de clientes:', error);
+            document.querySelector('.container-interno').innerHTML += '<p style="text-align: center; color: red;"><strong>Não foi possível carregar as métricas dos clientes.</strong></p>';
+        });
+});
+</script>
+{% endblock %}

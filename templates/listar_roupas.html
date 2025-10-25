@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Listar Roupas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="container-interno">
+        <h1>Listar Roupas</h1>
+        <label>Para fazer pesquisas nos itens, tecle: Ctrl+f.<br />Então digite o termo a ser pesquisado.</label>
+        <hr />
+        <p>
+            <nav style="text-align: center;">
+                <a href="{{ url_for('dashboard') }}">Painel de Controle</a> |
+                <a href="{{ url_for('adicionar_roupa') }}">Adicionar Roupas</a> |
+                <a href="{{ url_for('metrica') }}">Métrica</a>
+            </nav>
+        </p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><nav><a href="{{ url_for_listar_roupas('id', 'asc', ordenar_por, ordem) }}">ID</a></nav></th>
+                    <th><nav><a href="{{ url_for_listar_roupas('codigo_produto', 'asc', ordenar_por, ordem) }}">Código do Produto</a></nav></th>
+                    <th><nav><a href="{{ url_for_listar_roupas('tipo_roupa', 'asc', ordenar_por, ordem) }}">Tipo de Roupa</a></nav></th>
+                    <th><nav><a href="{{ url_for_listar_roupas('tecido', 'asc', ordenar_por, ordem) }}">Tecido</a></nav></th>
+                    <th><nav><a href="{{ url_for_listar_roupas('quantidade', 'asc', ordenar_por, ordem) }}">Quantidade</a></nav></th>
+                    <th><nav><a href="{{ url_for_listar_roupas('quantida_vendas', 'asc', ordenar_por, ordem) }}">Quantidade de Vendas</a></nav></th>
+                    <th><nav><a href="{{ url_for_listar_roupas('cor', 'asc', ordenar_por, ordem) }}">Cor</a></nav></th>
+                    <th><nav><a href="{{ url_for_listar_roupas('tamanhos', 'asc', ordenar_por, ordem) }}">Tamanhos</a></nav></th>
+                    <th><nav><a href="{{ url_for_listar_roupas('preco_unitario', 'asc', ordenar_por, ordem) }}">Preço Unitário</a></nav></th>
+                    <th><nav><a href="{{ url_for_listar_roupas('detalhes', 'asc', ordenar_por, ordem) }}">Detalhes</a></nav></th>
+                    <th>Ações</th> <!-- Nova coluna para ações -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for roupa in roupas %}
+                <tr>
+                    <td>{{ roupa.id |e }}</td>
+                    <td>{{ roupa.codigo_produto |e }}</td>
+                    <td>{{ roupa.tipo_roupa |e }}</td>
+                    <td>{{ roupa.tecido |e }}</td>
+                    <td>{{ roupa.quantidade |e }}</td>
+                    <td>{{ roupa.quantida_vendas |e }}</td>
+                    <td>{{ roupa.cor |e }}</td>
+                    <td>{{ roupa.tamanhos |e }}</td>
+                    <td>{{ "R${:,.2f}".format(roupa.preco_unitario).replace(",", "*").replace(".", ",").replace("*", ".") | e }}</td>
+                    <td>{{ roupa.detalhes |e }}</td>
+                    <td><a href="{{ url_for('editar_roupa', roupa_id=roupa.id) }}">Editar</a></td> <!-- Link de edição -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

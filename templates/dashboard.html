@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Bem-vindo, {{ usuario.nome |e }}!</h1>
+    <div class="container-interno">
+        <h2>Painel de Controle</h2>
+        <nav>
+            <a href="{{ url_for('listar_roupas') }}">Gerenciador de Roupas</a>
+        </nav>
+        <nav>
+            <a href="{{ url_for('gerenciar_funcionarios') }}">Gerenciador de Funcionários</a>
+        </nav>
+        <nav>
+            <a href="{{ url_for('dados_empresa') }}">Atualiza Dados da Empresa</a>
+        </nav>
+        <nav>
+            <a href="{{ url_for('painel_clientes') }}">Cadastrar Clientes</a>
+        </nav>
+        <nav>
+            <a href="{{ url_for('painel_compras') }}">Painel de Compras</a>
+        </nav>
+        <br />
+        <nav>
+            <a href="{{ url_for('exportar_vendas_nfe') }}">Exportar Vendas NF-e</a>
+        </nav>
+        <nav>
+            <a href="{{ url_for('metrica') }}">Métrica de Resultados</a>
+        </nav>
+        <nav style="border-top: 2px dotted var(--vermelho-escuro);">
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </div>
+</div>
+{% endblock %}

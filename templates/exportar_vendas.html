@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Exportar Vendas para NF-e{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="container-interno">
+        <h1>Exportar Vendas para Emissor de NF-e</h1>
+        <p>
+            <a href="{{ url_for('dashboard') }}">Voltar ao Painel de Controle</a>
+        </p>
+
+        <p>Selecione as vendas e o formato desejado para incluir no arquivo de exportação.</p>
+
+        {% if vendas %}
+        <form action="{{ url_for('gerar_arquivo_nfe') }}" method="POST">
+
+            <!-- ===================== OPÇÕES DE FORMATO ===================== -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label><strong>Escolha o formato de exportação:</strong></label><br>
+                <label style="margin-right: 15px;">
+                    <input type="radio" name="formato_exportacao" value="csv" checked> CSV (Ponto e Vírgula)
+                </label>
+                <label>
+                    <input type="radio" name="formato_exportacao" value="xml"> XML (Simplificado)
+                </label>
+                 <!-- O radio button para TXT foi removido -->
+            </div>
+            <!-- ============================================================= -->
+
+            <button type="submit" class="btn btn-primary" style="margin-bottom: 15px;">Gerar Arquivo Selecionado</button>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selecionar-todos"></th> <!-- Checkbox para selecionar todos -->
+                        <th>ID Venda</th>
+                        <th>Data</th>
+                        <th>Cliente</th>
+                        <th>Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venda in vendas %}
+                    <tr>
+                        <td><input type="checkbox" class="checkbox-venda" name="venda_ids" value="{{ venda.venda_id }}"></td>
+                        <td>{{ venda.venda_id }}</td>
+                        <td>{{ venda.data_venda }}</td>
+                        <td>{{ venda.nome_cliente }}</td>
+                        <td>R$ {{ "%.2f"|format(venda.valor_total_venda) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary">Gerar Arquivo Selecionado</button>
+        </form>
+        {% else %}
+        <p>Nenhuma venda recente encontrada para exportação.</p>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- Script simples para o checkbox "Selecionar Todos" -->
+<script>
+    document.getElementById('selecionar-todos').addEventListener('change', function(event) {
+        const checkboxes = document.querySelectorAll('.checkbox-venda');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = event.target.checked;
+        });
+    });
+</script>
+{% endblock %}
+

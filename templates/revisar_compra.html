@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Revisão da Compra{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="container-interno">
+        <h1>Revisão da Compra</h1>
+
+        <!-- ADICIONADO NOME DO VENDEDOR -->
+        <h4>Vendedor: {{ compra.vendedor }}</h4>
+        <h3>Cliente: {{ compra.cliente }}</h3>
+
+        <table class="tabela-revisao" style="width: 100%; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>Cód. Produto</th>
+                    <th>Tipo</th>
+                    <th>Cor</th>
+                    <th>Detalhes</th>
+                    <th>Qtd.</th>
+                    <th>Preço</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in compra.itens %}
+                <tr>
+                    <td>{{ item.codigo }}</td>
+                    <td>{{ item.tipo }}</td>
+                    <td>{{ item.cor }}</td>
+                    <td>{{ item.detalhes }}</td>
+                    <td>{{ item.quantidade }}</td>
+                    <td>R$ {{ "%.2f"|format(item.preco|float) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="text-align: right; margin-top: 20px; font-size: 1.5em;">
+            <strong>Total da Compra: R$ {{ "%.2f"|format(total) }}</strong>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center;">
+            <form method="POST" action="{{ url_for('finalizar_compra') }}">
+                <input type="hidden" name="dados_carrinho" value="{{ dados_carrinho_json }}">
+                <button type="submit" class="btn-finalizar">Fechar Compra</button>
+            </form>
+            <a href="{{ url_for('painel_compras') }}" style="display: inline-block; margin-top: 10px;">Cancelar e Voltar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

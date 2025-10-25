@@ -1,0 +1,245 @@
+/* Cores Primárias */
+:root {
+  --vermelho-principal: #e44d26;
+  --vermelho-secundario: #c63617;
+  --vermelho-escuro: #420303;
+  --cinza-claro: #f0f0f0;
+  --cinza-medio: #a9a9a9;
+  --cinza-escuro: #666666;
+  --branco-principal: #ffffff;
+}
+
+/* Criação de fontes */
+@font-face {
+    font-family: 'Gafata';
+    src: url('Fontes/Gafata-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'PlaywriteHU';
+    src: url('Fontes/PlaywriteHU-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@keyframes mudar-cor-cursor {
+  0%, 33% { caret-color: #ff001b; } /* Vermelho */
+  34%, 66% { caret-color: #00c4ff; } /* Cinza mais escuro */
+  64%, 76% { caret-color: #6ae100; } /* Cinza mais escuro */
+  85%, 100% { caret-color: #ffc400; } /* Azul mais brilhante */
+  100%, 120% { caret-color: #e600ff; } /* Lilás mais brilhante */
+}
+
+/* Estilos Gerais */
+body {
+  font-family: "PlaywriteHU", "Gafata", Arial;
+  margin: 0;
+  padding: 0;
+  background-color: var(--cinza-claro);
+  color: var(--cinza-escuro);
+  display: flex;              /* Organiza os filhos em coluna */
+  flex-direction: column;   /* Garante que os filhos se organizem verticalmente */
+  min-height: 100vh;          /* Garante que o body ocupe toda a altura da tela */
+}
+
+main {
+  flex: 1;                  /* Ocupa todo o espaço disponível, empurrando o footer para baixo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+footer {
+  background-color: var(--cinza-escuro);
+  color: var(--branco-principal);
+  text-align: center;
+  padding: 10px;
+}
+
+.container {
+  /*width: 80%;  Removido */
+  width: fit-content;       /* Adapta-se ao conteúdo */
+  min-width: 50%;           /* Garante uma largura mínima */
+  margin: 0px auto;
+  background-color: var(--branco-principal);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px var(--cinza-escuro);
+}
+
+.container-interno {
+  /*width: 80%;  Removido */
+  width: fit-content;       /* Adapta-se ao conteúdo */
+  min-width: 50%;           /* Garante uma largura mínima */
+  margin: 0px auto;
+  background-color: var(--cinza-claro);
+  padding: 20px;
+  border: none;
+  border-radius: 3px 3px 3px 3px;
+}
+
+/* Estilos para os painéis */
+.painel {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid var(--cinza-medio);
+  border-radius: 5px;
+}
+
+/* Centralizar conteúdo dos painéis */
+.painel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Estilos para formulários */
+.form-group {
+  margin-bottom: 10px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--cinza-escuro);
+}
+
+/* Estilos para campos de entrada de texto, número e select */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  font-family: "Gafata", Arial;
+  font-size: 20px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--cinza-medio);
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-bottom: 5px;
+  /* A animação 'mudar-cor-cursor' dura 3 segundos e repete infinitamente */
+  animation: mudar-cor-cursor 6.5s infinite;
+}
+
+/* Estilos para botões */
+input[type="submit"],
+button {
+  background-color: var(--vermelho-principal);
+  color: var(--branco-principal);
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover,
+button:hover {
+  background-color: var(--vermelho-secundario);
+}
+
+/* Estilos específicos para a tabela de clientes */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--cinza-medio);
+  padding: 8px;
+  text-align: left;
+}
+
+.table th {
+  background-color: var(--cinza-claro);
+  white-space: nowrap;   /* Evita quebra de palavras */
+}
+
+/* Estilos para links */
+a {
+    color: var(--vermelho-principal);
+    text-decoration: none; /* Remove o sublinhado padrão */
+}
+
+a:hover {
+    color: var(--vermelho-secundario); /* Altera a cor no hover, se desejar */
+}
+
+.container-flex {
+  display: flex;
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: center;    /* Centraliza verticalmente */
+  height: 300px;           /* Defina uma altura para o container */
+}
+
+/* Estilos para o container do painel de vendas */
+.painel-vendas-container {
+    display: flex;
+    flex-direction: column; /* Organiza os itens verticalmente */
+    align-items: center;     /* Centraliza os itens horizontalmente */
+    width: 90%;             /* Ocupa toda a largura disponível */
+}
+
+/* Estilos para as métricas */
+.metricas {
+    display: flex;
+    justify-content: space-around; /* Distribui os itens horizontalmente */
+    margin-bottom: 20px; /* Adiciona espaço abaixo das métricas */
+    width: 100%;             /* Ocupa toda a largura disponível */
+}
+
+.metricas > div {
+    background-color: var(--cinza-claro);
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    width: 45%; /* Ajusta a largura para ocupar um pouco menos da metade do contêiner */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Adiciona uma leve sombra */
+}
+
+.metricas > div:hover {
+    background-color: #e0e0e0; /* Escurece um pouco no hover */
+}
+
+
+    /* Estilos para o container de sugestões */
+    .sugestoes-container {
+        position: absolute;
+        border: 1px solid #ddd;
+        border-top: none;
+        z-index: 99;
+        background-color: white;
+        width: calc(100% - 2px); /* Ajusta a largura para corresponder ao input */
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+    /* Estilo para cada item de sugestão */
+    .sugestao-item {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    /* Efeito ao passar o mouse sobre um item */
+    .sugestao-item:hover {
+        background-color: #e9e9e9;
+    }
+
+    /* Estilo para a opção de cadastrar novo cliente */
+    .cadastrar-link {
+        display: block;
+        padding: 10px;
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .cadastrar-link:hover {
+        background-color: #f0f0f0;
+    }
+

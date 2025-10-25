@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Cliente{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="container-interno">
+        <h1>Editar Cliente</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="nome-cliente">Nome:</label>
+                <input type="text" class="form-control" id="nome-cliente" name="nome-cliente" value="{{ cliente.nome | e }}" required>
+            </div>
+            <div class="form-group">
+                <label for="telefone-cliente">Telefone:</label>
+                <input type="text" class="form-control" id="telefone-cliente" name="telefone-cliente" value="{{ cliente.telefone | e }}" oninput="mascaraTelefone(this)" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            <a href="{{ url_for('painel_clientes') }}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+<script>
+function mascaraTelefone(input) {
+    // Remove tudo que não for dígito
+    let numeros = input.value.replace(/\D/g, '');
+
+    // Define a máscara
+    let mascara = '(XX) XXX XXX XXX';
+
+    // Aplica a máscara
+    let resultado = '';
+    let i = 0;
+    let j = 0;
+    while (i < mascara.length && j < numeros.length) {
+        if (mascara[i] === 'X') {
+            resultado += numeros[j];
+            j++;
+        } else {
+            resultado += mascara[i];
+        }
+        i++;
+    }
+
+    input.value = resultado;
+}
+</script>
+{% endblock %}

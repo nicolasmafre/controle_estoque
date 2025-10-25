@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}" type="text/css">
+        <link rel="icon" href="{{ url_for('static', filename='imagens/controle_estoque.ico') }}" type="image/x-icon">
+        <title>{% block title %}Controle de Estoque de Roupas{% endblock %}</title>
+
+        <!-- Bibliotecas JScript para data mask e data picker -->
+        {% block scripts %}
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+            <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        {% endblock %}
+
+
+    </head>
+
+    <body>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer>
+            <p id="ano-atual"></p>
+            <script>
+                document.getElementById("ano-atual").innerHTML = new Date().getFullYear() + " - Controle de Estoque - Projeto Integrador Univesp (Grupo 9 - Eixo Técnologia)";
+            </script>
+        </footer>
+    </body>
+
+</html>

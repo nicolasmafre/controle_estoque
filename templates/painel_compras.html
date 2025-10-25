@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+
+{% block title %}Painel de Compras{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="container-interno">
+        <h1>Painel de Compras</h1>
+
+        <div style="padding-bottom: 20px;">
+            <a href="{{ url_for('dashboard') }}">Voltar ao Painel de Controle</a>
+        </div>
+        <div>
+            <div>
+                <h2>Compras</h2>
+                <form id="form-adicionar-produto" method="POST" action="{{ url_for('vender_roupa') }}">
+                    <!-- CAMPO DE VENDEDOR -->
+                    <div class="form-grupo" style="position: relative;">
+                        <label for="nome_vendedor">Nome do Vendedor (opcional)</label>
+                        <input type="text" id="nome_vendedor" name="nome_vendedor" placeholder="Padrão: Dono da Loja" autocomplete="off">
+                        <div id="sugestoes_vendedores" class="sugestoes-container"></div>
+                    </div>
+
+                    <!-- DADOS DA COMPRA (CLIENTE E PRODUTO) -->
+                    <div id="dados_compra">
+                         <div class="form-grupo" style="position: relative;">
+                            <label for="nome_cliente">Nome Cliente</label>
+                            <input type="text" id="nome_cliente" name="nome_cliente" required autocomplete="off">
+                            <div id="sugestoes_clientes" class="sugestoes-container"></div>
+                        </div>
+                        <div id="dados_produto" style="display: none;">
+                            <div class="form-grupo" style="position: relative;">
+                                <label for="cod_produto">Código do Produto</label>
+                                <input type="text" id="cod_produto" name="cod_produto" required autocomplete="off">
+                                <div id="sugestoes_produtos" class="sugestoes-container"></div>
+                            </div>
+                            <div class="form-grupo">
+                                <label for="quantidade">Quantidade</label>
+                                <!-- Adicionado o atributo 'max' que será definido pelo JS -->
+                                <input type="number" id="quantidade" name="quantidade" required autocomplete="off" min="1" max="">
+                                <!-- Pequeno texto para mostrar o estoque -->
+                                <small id="estoque-disponivel" style="color: grey; margin-left: 5px;"></small>
+
+                                <label for="preco_total">Valor da compra:</label>
+                                <input type="number" id="preco_total" name="preco_total" readonly required autocomplete="off" step="0.01">
+
+                                <button type="button" id="adicionar-ao-carrinho">Adicionar ao Carrinho</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="carrinho-container" class="carrinho" style="display: none; margin-top: 40px;">
+                    <h3 id="carrinho-vendedor-nome"></h3> <!-- Para nome do vendedor -->
+                    <h2 id="carrinho-cliente-nome"></h2>
+                    <table class="tabela-carrinho">
+                        <thead>
+                            <tr>
+                                <th>Cód. Produto</th>
+                                <th>Tipo</th>
+                                <th>Cor</th>
+                                <th>Detalhes</th>
+                                <th>Qtd.</th>
+                                <th>Preço Total</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="carrinho-itens-tbody">
+                        </tbody>
+                    </table>
+                    <button id="btn-finalizar-compra" class="btn-finalizar" style="margin-top: 20px;">Finalizar Compra</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Seletores de elementos ---
+    const inputVendedor = document.getElementById('nome_vendedor');
+    const sugestoesVendedoresContainer = document.getElementById('sugestoes_vendedores');
+    const dadosCompraDiv = document.getElementById('dados_compra');
+    const inputCliente = document.getElementById('nome_cliente');
+    const sugestoesClientesContainer = document.getElementById('sugestoes_clientes');
+    const dadosProdutoDiv = document.getElementById('dados_produto');
+    const inputProduto = document.getElementById('cod_produto');
+    const sugestoesProdutosContainer = document.getElementById('sugestoes_produtos');
+    const quantidadeInput = document.getElementById('quantidade');
+    const estoqueDisponivelMsg = document.getElementById('estoque-disponivel'); // Elemento para mensagem de estoque
+    const precoTotalInput = document.getElementById('preco_total');
+    const carrinhoContainer = document.getElementById('carrinho-container');
+    const carrinhoVendedorNome = document.getElementById('carrinho-vendedor-nome');
+    const carrinhoClienteNome = document.getElementById('carrinho-cliente-nome');
+    const carrinhoItensTbody = document.getElementById('carrinho-itens-tbody');
+    const btnAdicionarCarrinho = document.getElementById('adicionar-ao-carrinho');
+    const btnFinalizarCompra = document.getElementById('btn-finalizar-compra');
+
+    const nomeDonoLoja = "{{ usuario.nome|e }}";
+
+    // --- LÓGICA DE AUTOCOMPLETAR PARA VENDEDORES ---
+    // ... (código existente) ...
+    inputVendedor.addEventListener('input', function() {
+        const termo = inputVendedor.value.trim();
+        if (termo.length === 0) {
+            sugestoesVendedoresContainer.style.display = 'none';
+            return;
+        }
+        fetch(`{{ url_for('buscar_funcionarios') }}?query=${encodeURIComponent(termo)}`)
+            .then(response => response.json())
+            .then(funcionarios => {
+                sugestoesVendedoresContainer.innerHTML = '';
+                if (funcionarios.length > 0) {
+                    funcionarios.forEach(func => {
+                        const item = document.createElement('div');
+                        item.className = 'sugestao-item';
+                        item.textContent = func.nome_completo;
+                        item.addEventListener('click', () => {
+                            inputVendedor.value = func.nome_completo;
+                            sugestoesVendedoresContainer.style.display = 'none';
+                            inputCliente.focus();
+                        });
+                        sugestoesVendedoresContainer.appendChild(item);
+                    });
+                    sugestoesVendedoresContainer.style.display = 'block';
+                } else {
+                    sugestoesVendedoresContainer.style.display = 'none';
+                }
+            });
+    });
+
+    // --- LÓGICA DE AUTOCOMPLETAR PARA CLIENTES ---
+    // ... (código existente) ...
+    inputCliente.addEventListener('input', function() {
+        const termo = inputCliente.value.trim();
+        if (termo.length === 0) {
+            sugestoesClientesContainer.innerHTML = '';
+            sugestoesClientesContainer.style.display = 'none';
+            dadosProdutoDiv.style.display = 'none';
+            return;
+        }
+        fetch(`{{ url_for('buscar_clientes') }}?query=${encodeURIComponent(termo)}`)
+            .then(response => response.json())
+            .then(clientes => {
+                sugestoesClientesContainer.innerHTML = '';
+                if (clientes.length > 0) {
+                    clientes.forEach(cliente => {
+                        const item = document.createElement('div');
+                        item.className = 'sugestao-item';
+                        item.textContent = cliente.nome;
+                        item.addEventListener('click', () => {
+                            inputCliente.value = cliente.nome;
+                            sugestoesClientesContainer.style.display = 'none';
+                            dadosProdutoDiv.style.display = 'block';
+                            inputProduto.focus();
+                        });
+                        sugestoesClientesContainer.appendChild(item);
+                    });
+                } else {
+                    const linkCadastro = document.createElement('a');
+                    linkCadastro.className = 'cadastrar-link';
+                    linkCadastro.textContent = 'Cliente não encontrado. Cadastrar?';
+                    linkCadastro.href = "{{ url_for('painel_clientes') }}";
+                    sugestoesClientesContainer.appendChild(linkCadastro);
+                }
+                sugestoesClientesContainer.style.display = 'block';
+            });
+    });
+
+    // --- LÓGICA DE AUTOCOMPLETAR PARA PRODUTOS (COM ATUALIZAÇÃO DO MAX) ---
+    inputProduto.addEventListener('input', function() {
+        const termo = inputProduto.value.trim();
+        // Limpa o estoque disponível e o max ao digitar novo produto
+        quantidadeInput.max = '';
+        estoqueDisponivelMsg.textContent = '';
+
+        fetch(`{{ url_for('buscar_produtos') }}?query=${encodeURIComponent(termo)}`)
+            .then(response => response.json())
+            .then(produtos => {
+                sugestoesProdutosContainer.innerHTML = '';
+                if (produtos.length > 0){
+                    produtos.forEach(produto => {
+                        const item = document.createElement('div');
+                        item.className = 'sugestao-item';
+                        item.textContent = produto.codigo_produto;
+                        item.addEventListener('click', () => {
+                            inputProduto.value = produto.codigo_produto;
+                            sugestoesProdutosContainer.style.display = 'none';
+                            // Busca os detalhes COMPLETOS do produto, incluindo a quantidade
+                            fetch(`{{ url_for('buscar_produto_route') }}?codigo=${encodeURIComponent(produto.codigo_produto)}`)
+                                .then(res => res.json())
+                                .then(detalhes => {
+                                    if (detalhes && typeof detalhes.preco_unitario !== 'undefined') {
+                                        precoTotalInput.dataset.unitPrice = detalhes.preco_unitario;
+                                        precoTotalInput.value = detalhes.preco_unitario.toFixed(2);
+                                        quantidadeInput.value = 1; // Começa com 1
+
+                                        // =================== ALTERAÇÃO PRINCIPAL AQUI ===================
+                                        // Define o atributo 'max' do input de quantidade
+                                        quantidadeInput.max = detalhes.quantidade;
+                                        // Mostra a quantidade em estoque para o usuário
+                                        estoqueDisponivelMsg.textContent = `(Estoque: ${detalhes.quantidade})`;
+                                        // =============================================================
+
+                                        quantidadeInput.focus();
+                                    } else {
+                                        // Limpa se o produto não for encontrado ou não tiver preço
+                                        precoTotalInput.value = '';
+                                        quantidadeInput.value = '';
+                                        quantidadeInput.max = '';
+                                        estoqueDisponivelMsg.textContent = '';
+                                        delete precoTotalInput.dataset.unitPrice;
+                                    }
+                                });
+                        });
+                        sugestoesProdutosContainer.appendChild(item);
+                    });
+                    sugestoesProdutosContainer.style.display = 'block';
+                } else {
+                     sugestoesProdutosContainer.innerHTML = `<div class="sugestao-item" style="color: grey;">Nenhum produto em estoque encontrado.</div>`;
+                     sugestoesProdutosContainer.style.display = 'block';
+                }
+            });
+    });
+
+    // --- LÓGICA DE CÁLCULO DINÂMICO E VALIDAÇÃO DE ESTOQUE ---
+    quantidadeInput.addEventListener('input', function() {
+        const unitPrice = parseFloat(precoTotalInput.dataset.unitPrice);
+        let quantity = parseInt(quantidadeInput.value, 10);
+        const maxQuantity = parseInt(quantidadeInput.max, 10); // Pega o valor máximo definido
+
+        // =================== VALIDAÇÃO ADICIONAL AQUI ===================
+        // Verifica se a quantidade digitada excede o estoque máximo
+        if (!isNaN(maxQuantity) && quantity > maxQuantity) {
+            alert(`A quantidade não pode exceder o estoque disponível (${maxQuantity}).`);
+            quantity = maxQuantity; // Ajusta a quantidade para o máximo permitido
+            quantidadeInput.value = quantity; // Atualiza o valor no campo
+        }
+        // Garante que a quantidade mínima seja 1
+        if (quantity < 1) {
+            quantity = 1;
+            quantidadeInput.value = quantity;
+        }
+        // =============================================================
+
+        // Calcula o preço total
+        if (!isNaN(unitPrice) && !isNaN(quantity) && quantity >= 1) {
+            precoTotalInput.value = (unitPrice * quantity).toFixed(2);
+        } else {
+            precoTotalInput.value = '0.00';
+        }
+    });
+
+    // --- LÓGICA PARA ADICIONAR ITEM AO CARRINHO ---
+    // ... (código existente) ...
+    btnAdicionarCarrinho.addEventListener('click', function() {
+        const nomeVendedor = inputVendedor.value.trim() || nomeDonoLoja;
+        const nomeCliente = inputCliente.value.trim();
+        const codProduto = inputProduto.value.trim();
+        const quantidade = quantidadeInput.value;
+        const precoTotal = precoTotalInput.value;
+
+        if (!nomeCliente || !codProduto || !quantidade || parseFloat(precoTotal) <= 0) {
+            alert('Por favor, preencha todos os dados da compra.');
+            return;
+        }
+
+        // Validação final antes de adicionar ao carrinho
+        const maxQuantity = parseInt(quantidadeInput.max, 10);
+        if(parseInt(quantidade, 10) > maxQuantity){
+             alert(`A quantidade selecionada (${quantidade}) excede o estoque disponível (${maxQuantity}). Ajuste a quantidade.`);
+             quantidadeInput.focus();
+             return; // Impede de adicionar ao carrinho
+        }
+
+        fetch(`{{ url_for('buscar_detalhes_produto') }}?codigo=${encodeURIComponent(codProduto)}`)
+            .then(response => response.json())
+            .then(detalhesProduto => {
+                if (carrinhoContainer.style.display === 'none') {
+                    carrinhoContainer.style.display = 'block';
+                    carrinhoVendedorNome.textContent = `Vendedor: ${nomeVendedor}`;
+                    carrinhoClienteNome.textContent = `Cliente: ${nomeCliente}`;
+                    inputVendedor.readOnly = true;
+                    inputCliente.readOnly = true;
+                }
+
+                const newRow = carrinhoItensTbody.insertRow();
+                newRow.innerHTML = `
+                    <td>${detalhesProduto.codigo_produto}</td>
+                    <td>${detalhesProduto.tipo_roupa}</td>
+                    <td>${detalhesProduto.cor}</td>
+                    <td>${detalhesProduto.detalhes}</td>
+                    <td>${quantidade}</td>
+                    <td>R$ ${parseFloat(precoTotal).toFixed(2)}</td>
+                    <td><button type="button" class="btn-remover">Remover</button></td>
+                `;
+
+                newRow.querySelector('.btn-remover').addEventListener('click', function() {
+                    newRow.remove();
+                    if (carrinhoItensTbody.rows.length === 0) {
+                        carrinhoContainer.style.display = 'none';
+                        inputVendedor.readOnly = false;
+                        inputCliente.readOnly = false;
+                    }
+                });
+
+                // Limpa campos após adicionar
+                inputProduto.value = '';
+                quantidadeInput.value = '1';
+                precoTotalInput.value = '';
+                quantidadeInput.max = ''; // Limpa o max
+                estoqueDisponivelMsg.textContent = ''; // Limpa a mensagem
+                delete precoTotalInput.dataset.unitPrice;
+                inputProduto.focus();
+            });
+    });
+
+    // --- LÓGICA PARA FINALIZAR A COMPRA ---
+    // ... (código existente) ...
+    btnFinalizarCompra.addEventListener('click', function() {
+        const itensNasTabelas = carrinhoItensTbody.querySelectorAll('tr');
+        if (itensNasTabelas.length === 0) {
+            alert('O carrinho está vazio!');
+            return;
+        }
+
+        const itensDoCarrinho = [];
+        itensNasTabelas.forEach(linha => {
+            const celulas = linha.querySelectorAll('td');
+            itensDoCarrinho.push({
+                codigo: celulas[0].textContent,
+                tipo: celulas[1].textContent,
+                cor: celulas[2].textContent,
+                detalhes: celulas[3].textContent,
+                quantidade: parseInt(celulas[4].textContent),
+                preco: celulas[5].textContent.replace('R$', '').trim()
+            });
+        });
+
+        const dadosDaCompra = {
+            vendedor: inputVendedor.value.trim() || nomeDonoLoja,
+            cliente: inputCliente.value,
+            itens: itensDoCarrinho
+        };
+
+        const formOculto = document.createElement('form');
+        formOculto.method = 'POST';
+        formOculto.action = `{{ url_for('revisar_compra') }}`;
+        const inputOculto = document.createElement('input');
+        inputOculto.type = 'hidden';
+        inputOculto.name = 'dados_carrinho';
+        inputOculto.value = JSON.stringify(dadosDaCompra);
+        formOculto.appendChild(inputOculto);
+        document.body.appendChild(formOculto);
+        formOculto.submit();
+    });
+
+
+    // --- OUVINTE GLOBAL PARA FECHAR SUGESTÕES ---
+    // ... (código existente) ...
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.form-grupo')) {
+            sugestoesVendedoresContainer.style.display = 'none';
+            sugestoesClientesContainer.style.display = 'none';
+            sugestoesProdutosContainer.style.display = 'none';
+        }
+    });
+
+});
+</script>
+{% endblock %}
+

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Análise de Performance dos Funcionários{% endblock %}
+
+{% block content %}
+<style>
+    .chart-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 40px;
+        margin-top: 30px;
+    }
+    .chart-container {
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+    }
+</style>
+
+<div class="container">
+    <div class="container-interno">
+        <h1>Análise de Performance dos Funcionários</h1>
+        <p>
+            <a href="{{ url_for('dashboard') }}">Voltar ao Painel de Controle</a> |
+            <a href="{{ url_for('gerenciar_funcionarios') }}">Ir à Lista de Funcionários</a> |
+            <a href="{{ url_for('metrica') }}">Métricas de Vendas</a> |
+            <a href="{{ url_for("metrica_clientes") }}">Métrica Clientes</a>
+        </p>
+
+        <div class="chart-grid">
+            <div class="chart-container">
+                <canvas id="graficoTopVendedores"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="graficoVendasTrimestrais"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const FUNCIONARIOS_METRICS_URL = "{{ url_for('dados_metricas_funcionarios') }}";
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch(FUNCIONARIOS_METRICS_URL)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro na rede: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // --- 1. Renderiza o Gráfico de Top 10 Vendedores (Barras) ---
+            const ctxTop = document.getElementById('graficoTopVendedores').getContext('2d');
+            
+            // Define a cor das barras: verde escuro para os 3 primeiros, cinza para os outros
+            const topVendedoresCores = data.top_sellers.labels.map((_, index) => {
+                return index < 3 ? 'rgba(25, 135, 84, 0.7)' : 'rgba(108, 117, 125, 0.7)';
+            });
+
+            new Chart(ctxTop, {
+                type: 'bar',
+                data: {
+                    labels: data.top_sellers.labels,
+                    datasets: [{
+                        label: 'Valor Total Vendido (R$)',
+                        data: data.top_sellers.values,
+                        backgroundColor: topVendedoresCores,
+                        borderColor: topVendedoresCores.map(color => color.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y', // Deixa o gráfico na horizontal para melhor leitura dos nomes
+                    scales: { x: { beginAtZero: true } },
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Top 10 Vendedores (Últimos 12 Meses)',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+
+            // --- 2. Renderiza o Gráfico de Vendas Trimestrais (Barras Agrupadas) ---
+            const ctxQuarterly = document.getElementById('graficoVendasTrimestrais').getContext('2d');
+            new Chart(ctxQuarterly, {
+                type: 'bar',
+                data: {
+                    labels: data.quarterly_sales.labels,
+                    datasets: data.quarterly_sales.datasets
+                },
+                options: {
+                    responsive: true,
+                    scales: { 
+                        x: { stacked: false },
+                        y: { stacked: false, beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: {
+                            display: true,
+                            text: 'Vendas Trimestrais por Funcionário',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar dados para o dashboard de funcionários:', error);
+            document.querySelector('.container-interno').innerHTML += '<p style="text-align: center; color: red;"><strong>Não foi possível carregar os dados de performance.</strong></p>';
+        });
+});
+</script>
+{% endblock %}

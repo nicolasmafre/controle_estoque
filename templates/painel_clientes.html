@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Painel de Cadastrar Clientes{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="painel-vendas-container">  <!-- Alterado o nome da classe -->
+        <h1>Painel de Cadastrar Clientes</h1>
+        <div>
+            <nav>
+                <a href="{{ url_for("dashboard") }}">Voltar ao Painel de Controle</a> |
+                <a href="{{ url_for("metrica_clientes") }}">Métrica</a></a>
+            </nav>
+        </div>
+
+        <div id="painel-clientes" class="painel" style="display: block;">
+            <h2>Cadastro de Cliente</h2>
+            <form id="form-cliente"  action="{{ url_for('cadastrar_cliente') }}" method="POST">
+                <div class="form-group">
+                    <label for="nome-cliente">Nome Completo:</label>
+                    <input type="text" id="nome-cliente" name="nome-cliente" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefone-cliente">Telefone:</label>
+                    <input type="text" id="telefone-cliente" name="telefone-cliente" oninput="mascaraTelefone(this)" required>
+                </div>
+                <button type="submit">Cadastrar Cliente</button>
+            </form>
+
+            <h2>Clientes Cadastrados</h2>
+            {% if clientes %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Telefone</th>
+                        <!-- NOVAS COLUNAS DE MÉTRICAS -->
+                        <th>Total de Compras</th>
+                        <th>Gasto (Últimos 3 Meses)</th>
+                        <th colspan="2">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                        <tr>
+                            <td>{{ cliente.nome }}</td>
+                            <td>{{ cliente.telefone }}</td>
+                            <!-- EXIBIÇÃO DAS NOVAS MÉTRICAS -->
+                            <td>{{ cliente.total_compras }}</td>
+                            <td>R$ {{ "%.2f"|format(cliente.total_gasto_3m) }}</td>
+                            <td>
+                                <a href="{{ url_for('editar_cliente', cliente_id=cliente.id) }}">Editar</a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('painel_compras') }}">Comprar</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>Nenhum cliente cadastrado ainda.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function mascaraTelefone(input) {
+    // Remove tudo que não for dígito
+    let numeros = input.value.replace(/\D/g, '');
+
+    // Define a máscara
+    let mascara = '(XX) XXX XXX XXX';
+
+    // Aplica a máscara
+    let resultado = '';
+    let i = 0;
+    let j = 0;
+    while (i < mascara.length && j < numeros.length) {
+        if (mascara[i] === 'X') {
+            resultado += numeros[j];
+            j++;
+        } else {
+            resultado += mascara[i];
+        }
+        i++;
+    }
+
+    input.value = resultado;
+}
+</script>
+{% endblock %}

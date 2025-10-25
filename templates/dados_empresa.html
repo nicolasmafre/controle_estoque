@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Dados da Empresa{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="container-interno">
+        <h1>Dados da Empresa</h1>
+        <nav>
+            <a href="{{ url_for('dashboard') }}">Painel de Controle</a>
+             |
+            <a href="{{ url_for('atualizar_dados_empresa') }}">Atualizar Dados</a>
+        </nav>
+
+        <h2>Dados do Usuário</h2>
+        <p><strong>Nome Completo:</strong> {{ usuario.nome | e}} {{ usuario.sobrenome | e}}</p>
+        <p><strong>Data de Nascimento:</strong> {{ data_nascimento_formatada | e }}</p>
+        <p><strong>Email:</strong> {{ usuario.email | e}}</p>
+
+        <h2>Dados da Empresa</h2>
+        {% if empresa %}
+            <p><strong>Nome Fantasia:</strong> {{ empresa.nome_fantasia | e}}</p>
+            <p><strong>CNPJ:</strong> {{ empresa.cnpj | e}}</p>
+            <p><strong>Razão Social:</strong> {{ empresa.razao_social | e}}</p>
+            <p><strong>CNAE:</strong> {{ empresa.cnae | e}}</p>
+            <p><strong>Inscrição Estadual (IE):</strong>{{ empresa.inscricao_estadual | e }}</p>
+            <p><strong>Inscrição Municipal:</strong>{{ empresa.inscricao_municipal | e }}</p>
+            <p><strong>Regime Tributário:</strong>{{ empresa.regime_tributario | e }}</p>
+            <p><strong>CEP:</strong> {{ empresa.cep | e}}</p>
+            <p><strong>Rua:</strong> {{ empresa.rua | e}}</p>
+            <p><strong>Bairro:</strong> {{ empresa.bairro | e}}</p>
+            <p><strong>Cidade:</strong> {{ empresa.cidade | e}}</p>
+            <p><strong>Estado:</strong> {{ empresa.estado | e}}</p>
+            <p><strong>País:</strong> {{ empresa.pais | e}}</p>
+        {% else %}
+            <p>Nenhuma empresa cadastrada.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

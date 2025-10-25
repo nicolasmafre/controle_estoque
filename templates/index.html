@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Sistemas de Lojas de Roupas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="container-flex">
+        <img src="{{ url_for('static', filename='imagens/controle.png') }}" alt="Imagem de controle" style="width: 50%; height: 100%;" />
+    </div>
+        <div class="container-interno">
+            <h1>Login</h1>
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+            <form method="POST" action="/">
+                <div class="form-row">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" required />
+                </div>
+                <div class="form-row">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" required />
+                </div>
+                <input type="submit" value="Login" />
+            </form>
+        </div>
+        <div>
+            <p>
+                <nav style="text-align: center;">
+                    <!-- Se a variável 'admin_existe' for False, o link de registro funciona normalmente. -->
+                    {% if not admin_existe %}
+                        <a href="{{ url_for('registrar') }}">Cadastrar-se</a> |
+                    <!-- Se 'admin_existe' for True, o link é desativado e estilizado para parecer inativo. -->
+                    {% else %}
+                        <a style="color: grey; cursor: not-allowed; text-decoration: none;" title="O registro está desativado pois o administrador já foi criado.">Cadastrar-se</a> |
+                    {% endif %}
+                    <a href="{{ url_for('recuperar_senha') }}">Recuperar Senha</a>
+                </nav>
+            </p>
+        </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Nova Senha{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Nova Senha</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <form method="POST" action="/nova_senha">
+        <div class="form-row">
+            <label for="senha">Nova Senha</label>
+            <input type="password" id="senha" name="senha" required />
+        </div>
+        <div class="form-row">
+            <label for="confirmar_senha">Confirmar Senha</label>
+            <input type="password" id="confirmar_senha" name="confirmar_senha" required />
+        </div>
+        <input type="submit" value="Alterar Senha" />
+    </form>
+</div>
+{% endblock %}
