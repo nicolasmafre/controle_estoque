@@ -4,7 +4,7 @@
 
 ## Sobre
 
-Este projeto é uma aplicação web para auxiliar no controle e gerenciamento de estoque. Ele permite aos usuários gerenciar e monitorar os produtos disponíveis, garantindo que a quantidade certa de itens esteja disponível no momento certo, evitando excessos ou faltas.
+>Este projeto é uma aplicação web para auxiliar no controle e gerenciamento de estoque. Ele permite aos usuários gerenciar e monitorar os produtos disponíveis, garantindo que a quantidade certa de itens esteja disponível no momento certo, evitando excessos ou faltas.
 
 ## Estrutura do Projeto
 
@@ -27,10 +27,13 @@ controle-estoque/
 │   ├── editar_cliente.html             # Template para editar os daddos dos clientes já cadastrados
 │   ├── editar_funcionario.html         # Template para editar os dados dos funcionário já cadastrados
 │   ├── editar_roupa.html               # Template para edição de roupas já cadastradas
+│   ├── exportar_venda.html             # Template para exportar as NF-e semiautomáticas
 │   ├── index.html                      # Template inicial do sistema de estoque
 │   ├── listar_funcionarios.html        # Template para listar os funcionários cadastrados no sistema
 │   ├── listar_roupas.html              # Template para listar as roupas cadastradas
 │   ├── metrica.html                    # Template para analisar os dados do estoque e de vendas
+│   ├── metrica_clientes.html           # template para acessar o painel de clientes que mais compraram
+│   ├── metrica_funcionarios.html       # template para acessar o painel de rendimentos dos funcionários
 │   ├── nova_senha.html                 # template para acessar o painel de recuperação senha
 │   ├── painel_clientes.html            # Template para listar e cadastrar clientes
 │   ├── painel_compras.html             # Template para que serve como uma sacola de compras
@@ -68,58 +71,63 @@ controle-estoque/
 
 Certifique-se de ter o Python instalado (versão 3.6 ou superior). Recomenda-se o uso de um ambiente virtual para isolar as dependências do projeto. Você pode usar o `venv` (nativo do Python) ou o Anaconda.
 
-### 1.2. Instalação
+#### 1.1.1. Python e Miniconda:
+
+- [Python](https://www.python.org/downloads/)
+- [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+
+#### 1.1.2. Anaconda no Windows:
+
+1. Instale o Miniconda no Windows atrasés do instalador,
+2. Abra o `sysdm.cpl` pelo _prompt_ de comando,
+3. Acesse a guia _Advanced_,
+4. Adicione o caminho do Miniconda ao _Path_ do sistema,
+4.1. %USERPROFILE%\miniconda3\Scripts
+4.2. %USERPROFILE%\miniconda3 
+4.3. %USERPROFILE%\miniconda3\Library\bin;
+5. Reinicie o _prompt_ de comando.
+5.1. Inicio o _conda_ com o comando `conda init` e reinicie o _prompt_ de comando.
+
+### 1.2. Instalação da aplicação web
 
 - 1.  Clone o repositório:
-
     ```
-    git clone https://github.com/RodrigoCAzevedo/controle-estoque.git
+    git clone https://github.com/nicolasmafre/controle_estoque.git
     cd controle-estoque
     ```
 - No caso do clone há outras opções além do HTTPS:
-  - SSH: git@github.com:RodrigoCAzevedo/controle-estoque.git
-  - GitHub CLI: gh repo clone RodrigoCAzevedo/controle-estoque
+  - SSH: git@github.com:nicolasmafre/controle_estoque.git
+  - GitHub CLI: gh repo clone nicolasmafre/controle_estoque
 
 - 2.  Crie e ative um ambiente virtual (opcional, mas recomendado):
 
     *   **Python venv:**
 
         ```
-        python3 -m venv venv
-        source venv/bin/activate   # No Linux/macOS
+        python3 -m venv controle_estoque 
+        source controle_estoque/bin/activate   # No Linux/macOS
         venv\Scripts\activate.bat  # No Windows
         ```
     *   **Anaconda:**
 
         ```
-        conda create --name <nome_do_ambiente> python=3.x
-        conda activate <nome_do_ambiente>
+        conda create --name controle_estoque python=3.x
+        conda activate controle_estoque
         ``` 
 
 - 3.  Instale as dependências:
 
- - Opção 1: (Recomendada)
-
-    - Windows:
+  - Windows:
     ```
     → controle_estoque.bat                # Bash script para Windows
-        |→ hypercorn --bind 127.0.0.1:80  # Para Windows
+    → hypercorn --bind 127.0.0.1:80  # Prompt de comando para Windows
     ```
-   - Linux:
-   ```
-   → hypercorn --bind 127.0.0.1:8080     # Para Linux
-   ```
-
- - Opção 2:
-
+  - Linux:
     ```
-    pip install -r requirements.txt
+    → hypercorn --bind 127.0.0.1:8080     # Para Linux
     ```
-    *No código já tem um mecanismo de instalação automático dos módulos
-
 
 - 4.  Crie o banco de dados:
-4. 
     ```
     flask init-db
     ```
@@ -132,7 +140,7 @@ Certifique-se de ter o Python instalado (versão 3.6 ou superior). Recomenda-se 
 flask run --port 80 --debug     # Windows
 flask run --port 8080 --debug   # Linux
 ```
- - → **Windows:** http://localhost:80
+ - → **Windows:** http://localhost
  - → **Linux:** http://localhost:8080
 
 **Ambiente de Produção**
@@ -141,19 +149,19 @@ flask run --port 8080 --debug   # Linux
 hypercorn --bind 0.0.0.0:80 app:app   # Windows
 hypercorn --bind 0.0.0.0:8080 app:app # Linux
 ```
- - → **Windows:** http://localhost:80
+ - → **Windows:** http://localhost
  - → **Linux:** http://localhost:8080
 
 ## 2. Funcionalidades
 - **Login/Registro:** Autenticação de usuários com senhas criptografadas.
 - **Dashboard:** Painel de controle centralizado com acesso às principais funcionalidades.
 - **Gerênciar de Produtos:**
-    - Lista de Roupas.
+    - **Lista de Roupas:** Informações sobre o estoque e características de produtos.
       - Cadastrar de Roupas
         - Editar Roupas
 
 - **Gerênciar Funcionários:**
-    - Listar Funcionários
+    - Listar Funcionários: Informações sobre os funcionários e seus respectivos dados.
       - Cadastrar Funcionários
         - Editar Cadastro de Funcionários
 
@@ -161,13 +169,23 @@ hypercorn --bind 0.0.0.0:8080 app:app # Linux
   - Cadastro e Listagem de clientes.
     - Editar Cadastro de Clientes
 
+- **Atualiza Dados da Empresa:** Informações sobre a empresa e seus respectivos dados.
+  - Atualizar Dados:
+
+- **Painel de Compras:** Sacola de compras com a possibilidade de revisar e finalizar a compra.
+
+- **Exportar Vendas NF-e:** Exporta as vendas para o sistema de NF-e, sem a necessidade de preencher os dados da empresa e dos clientes.
+
+- **Métrica de Resultados:** Análise de Cliente, de Performance de Vendas e de Funcionários.
+
+
 ## 3. Acesso ao Projeto
 - URLs de acesso:
   - **Desenvolvimento:**
-    - **Windows**: `http://localhost:80` (_flask run --host=127.0.0.1 --port=80 --debug_)
+    - **Windows**: `http://localhost` (_flask run --host=127.0.0.1 --port=80 --debug_)
     - **Linux**: `https://localhost:8080` (_flask run --host=127.0.0.1 --port=8080 --debug_)
   - **Produção:** 
-    - **Windows**: `http://localhost:80` (_hypercorn --bind 127.0.0.1:80 app:app_)
+    - **Windows**: `http://localhost` (_hypercorn --bind 127.0.0.1:80 app:app_)
     - **Linux**: `https://localhost:8080` (_hypercorn --bind 127.0.0.1:8080 app:app_)
 
 ## 4. Desenvolvedor

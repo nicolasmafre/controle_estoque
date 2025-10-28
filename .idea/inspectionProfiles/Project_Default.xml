@@ -1,0 +1,54 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="CssUnknownProperty" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myCustomPropertiesEnabled" value="true" />
+      <option name="myIgnoreVendorSpecificProperties" value="false" />
+      <option name="myCustomPropertiesList">
+        <value>
+          <list size="1">
+            <item index="0" class="java.lang.String" itemvalue="-fundo-index" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="expat" />
+          <option value="libstdcxx-ng" />
+          <option value="libxcb" />
+          <option value="pthread-stubs" />
+          <option value="sqlite" />
+          <option value="xorg-libx11" />
+          <option value="xorg-libxau" />
+          <option value="xorg-libxdmcp" />
+          <option value="xorg-xorgproto" />
+          <option value="xz" />
+          <option value="zlib" />
+          <option value="blinker" />
+          <option value="click" />
+          <option value="exceptiongroup" />
+          <option value="flask" />
+          <option value="h11" />
+          <option value="h2" />
+          <option value="hpack" />
+          <option value="hypercorn" />
+          <option value="hyperframe" />
+          <option value="importlib-metadata" />
+          <option value="itsdangerous" />
+          <option value="jinja2" />
+          <option value="libgcc-ng" />
+          <option value="markupsafe" />
+          <option value="priority" />
+          <option value="taskgroup" />
+          <option value="tomli" />
+          <option value="typing-extensions" />
+          <option value="werkzeug" />
+          <option value="wsproto" />
+          <option value="zipp" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
