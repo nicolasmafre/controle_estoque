@@ -82,11 +82,15 @@ Certifique-se de ter o Python instalado (versão 3.6 ou superior). Recomenda-se 
 2. Abra o `sysdm.cpl` pelo _prompt_ de comando,
 3. Acesse a guia _Advanced_,
 4. Adicione o caminho do Miniconda ao _Path_ do sistema,
-4.1. %USERPROFILE%\miniconda3\Scripts
-4.2. %USERPROFILE%\miniconda3 
-4.3. %USERPROFILE%\miniconda3\Library\bin;
+
+   4.1. %USERPROFILE%\miniconda3\Scripts
+
+   4.2. %USERPROFILE%\miniconda3 
+
+   4.3. %USERPROFILE%\miniconda3\Library\bin;
 5. Reinicie o _prompt_ de comando.
-5.1. Inicio o _conda_ com o comando `conda init` e reinicie o _prompt_ de comando.
+
+   5.1. Inicio o _conda_ com o comando `conda init` e reinicie o _prompt_ de comando.
 
 ### 1.2. Instalação da aplicação web
 
